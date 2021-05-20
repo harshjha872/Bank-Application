@@ -82,6 +82,25 @@ const upDateUI = function (acc) {
   callDisplayBalance(acc);
 
 }
+let Timer;
+//Timer
+const StartTimer = function () {
+  const clock = function () {
+    let min = String(Math.trunc(time / 60)).padStart(2, 0);
+    let second = String(Math.trunc(time % 60)).padStart(2, 0);
+    labelTimer.textContent = `${min}:${second}`;
+
+    if (time === 0) {
+      clearInterval(Timer);
+      containerApp.style.opacity = 0;
+      labelWelcome.textContent = `Log in to get started`;
+    }
+    time--;
+  }
+  let time = 300;
+  Timer = setInterval(clock, 1000);
+  return Timer;
+}
 
 
 const displayMovements = function (movements, sort = false) {
@@ -100,7 +119,7 @@ const displayMovements = function (movements, sort = false) {
     const html = `<div class="movements__row">
                     <div class="movements__type movements__type--${type}">${i} ${type}</div>
                     <div class="movements__date"></div>
-                    <div class="movements__value">${mov}€</div>
+                    <div class="movements__value">${mov}$</div>
                   </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -126,7 +145,7 @@ const callDisplayBalance = function (accs) {
   accs.totalValue = accs.movements.reduce(
     (acc, curEl) => acc + curEl, 0
   );
-  labelBalance.textContent = accs.totalValue;
+  labelBalance.textContent = `${accs.totalValue}$`;
 }
 
 // callDisplayBalance(account1.movements);
@@ -135,12 +154,12 @@ const calcDisplaySummary = function (acc) {
   const incomes = acc.movements
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumIn.textContent = `${incomes}€`;
+  labelSumIn.textContent = `${incomes}$`;
 
   const out = acc.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumOut.textContent = `${Math.abs(out)}€`;
+  labelSumOut.textContent = `${Math.abs(out)}$`;
 
   const interest = acc.movements
     .filter(mov => mov > 0)
@@ -150,7 +169,7 @@ const calcDisplaySummary = function (acc) {
       return int >= 1;
     })
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = `${interest}€`;
+  labelSumInterest.textContent = `${interest}$`;
 };
 
 //Login Account haldler
@@ -174,6 +193,10 @@ btnLogin.addEventListener('click', function (e) {
     inputLoginPin.blur();
 
     upDateUI(currentAccount);
+
+    //Start Timer
+    if (Timer) clearInterval(Timer);
+    StartTimer();
 
   }
 });
@@ -203,6 +226,10 @@ btnTransfer.addEventListener('click', function (e) {
 
     //update UI
     upDateUI(currentAccount);
+
+    //Start Timer
+    if (Timer) clearInterval(Timer);
+    StartTimer();
   }
 });
 
@@ -227,6 +254,11 @@ btnClose.addEventListener('click', function (e) {
 });
 
 btnLoan.addEventListener('click', function (e) {
+
+  //Start Timer
+  if (Timer) clearInterval(Timer);
+  StartTimer();
+
   e.preventDefault();
   const amount = Number(inputLoanAmount.value);
 
